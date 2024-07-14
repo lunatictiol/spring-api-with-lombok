@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -103,9 +104,9 @@ class JuiceControllerIT {
     }
     @Test
     void getAllJuices() {
-     List<JuiceDTO> juiceDTOList = juiceController.listJuices(null,null,null, 1, 2);
+     Page<JuiceDTO> juiceDTOList = juiceController.PageJuices(null,null,null, 1, 50);
 
-     assertThat(juiceDTOList.size()).isEqualTo(2410);
+     assertThat(juiceDTOList.getContent().size()).isEqualTo(50);
 
     }
     @Transactional
@@ -113,9 +114,9 @@ class JuiceControllerIT {
     @Test
     void juiceListNotFoundException() {
         juiceRepository.deleteAll();
-        List<JuiceDTO> juiceDTOList = juiceController.listJuices(null,null,null, 1, 2);
+        Page<JuiceDTO> juiceDTOList = juiceController.PageJuices(null,null,null, 1, 2);
 
-        assertThat(juiceDTOList.size()).isEqualTo(0);
+        assertThat(juiceDTOList.getContent().size()).isEqualTo(0);
 
     }
 
@@ -174,17 +175,19 @@ class JuiceControllerIT {
     }
     @Test
     void getJuiceByName() throws Exception{
-        mockMvc.perform(get(JuiceController.JUICE_PATH).queryParam("juiceName", "IPA"))
+        mockMvc.perform(get(JuiceController.JUICE_PATH).queryParam("juiceName", "IPA")
+                .queryParam("size", "800"))
         .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()",is(336)))
+                .andExpect(jsonPath("$.content.size()",is(336)))
                 ;
 
     }
     @Test
     void getJuiceByStyle() throws Exception{
-        mockMvc.perform(get(JuiceController.JUICE_PATH).queryParam("juiceStyle", JuiceStyle.IPA.name()))
+        mockMvc.perform(get(JuiceController.JUICE_PATH).queryParam("juiceStyle", JuiceStyle.IPA.name())
+                .queryParam("size", "800"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()",is(547)))
+                .andExpect(jsonPath("$.content.size()",is(547)))
         ;
 
     }
@@ -192,9 +195,10 @@ class JuiceControllerIT {
     void getJuiceByNameAndStyle() throws Exception{
 
         mockMvc.perform(get(JuiceController.JUICE_PATH).queryParam("juiceName", "IPA")
-                        .queryParam("juiceStyle", JuiceStyle.IPA.name()))
+                        .queryParam("juiceStyle", JuiceStyle.IPA.name())
+                .queryParam("size", "800"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()",is(310)))
+                .andExpect(jsonPath("$.content.size()",is(310)))
         ;
 
     }
@@ -203,10 +207,11 @@ class JuiceControllerIT {
 
         mockMvc.perform(get(JuiceController.JUICE_PATH).queryParam("juiceName", "IPA")
                         .queryParam("juiceStyle", JuiceStyle.IPA.name())
+                        .queryParam("size", "800")
                         .queryParam("showInventory","true"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()",is(310)))
-                .andExpect(jsonPath("$.[0].quantityOnHand",is(IsNull.notNullValue())))
+                .andExpect(jsonPath("$.content.size()",is(310)))
+                .andExpect(jsonPath("$.content.[0].quantityOnHand",is(IsNull.notNullValue())))
         ;
 
     }
@@ -215,10 +220,11 @@ class JuiceControllerIT {
 
         mockMvc.perform(get(JuiceController.JUICE_PATH).queryParam("juiceName", "IPA")
                         .queryParam("juiceStyle", JuiceStyle.IPA.name())
+                        .queryParam("size", "800")
                         .queryParam("showInventory","false"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()",is(310)))
-                .andExpect(jsonPath("$.[0].quantityOnHand",is(IsNull.nullValue())))
+                .andExpect(jsonPath("$.content.size()",is(310)))
+                .andExpect(jsonPath("$.content.[0].quantityOnHand",is(IsNull.nullValue())))
         ;
 
     }
@@ -231,9 +237,10 @@ class JuiceControllerIT {
                         .queryParam("pageNumber", "2")
                         .queryParam("size", "50"))
 
+
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()",is(50)))
-                .andExpect(jsonPath("$.[0].quantityOnHand",is(IsNull.nullValue())))
+                .andExpect(jsonPath("$.content.size()",is(50)))
+                .andExpect(jsonPath("$.content.[0].quantityOnHand",is(IsNull.nullValue())))
         ;
 
     }

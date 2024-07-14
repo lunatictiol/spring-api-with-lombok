@@ -56,7 +56,7 @@ public class JuiceDTOControllerTest {
 
     @Test
     void patchJuiceDTO() throws Exception {
-        JuiceDTO juiceDTO = juiceServiceImpl.listJuices(null, null, null, 1, 25).get(0);
+        JuiceDTO juiceDTO = juiceServiceImpl.PageJuice(null, null, null, 1, 25).getContent().get(0);
 
 
         Map<String, Object> juiceMap = new HashMap<>();
@@ -76,7 +76,7 @@ public class JuiceDTOControllerTest {
 
     @Test
     void deleteJuice() throws Exception {
-        JuiceDTO juiceDTO = juiceServiceImpl.listJuices(null, null, null, 1, 25).get(0);
+        JuiceDTO juiceDTO = juiceServiceImpl.PageJuice(null, null, null, 1, 25).getContent().get(0);
        given(juiceService.deleteJuice(any())).willReturn(true);
         mockMvc.perform(delete(JuiceController.JUICE_PATH_WITH_ID, juiceDTO.getId())
                 .accept(MediaType.APPLICATION_JSON))
@@ -89,7 +89,7 @@ public class JuiceDTOControllerTest {
 
     @Test
     void getJuiceById() throws Exception {
-        JuiceDTO testJuiceDTO = juiceServiceImpl.listJuices(null, null, null, 1, 25).get(0);
+        JuiceDTO testJuiceDTO = juiceServiceImpl.PageJuice(null, null, null, 1, 25).getContent().get(0);
         given(juiceService.getJuiceById(testJuiceDTO.getId())).willReturn(Optional.of(testJuiceDTO));
 
         mockMvc.perform(get(JuiceController.JUICE_PATH_WITH_ID, testJuiceDTO.getId())
@@ -103,13 +103,13 @@ public class JuiceDTOControllerTest {
 
     @Test
     void listJuices() throws Exception {
-        given(juiceService.listJuices(null, null, null, 1, 25)).willReturn(juiceServiceImpl.listJuices(null, null, null, 1, 25));
+        given(juiceService.PageJuice(any(), any(), any(), any(), any())).willReturn(juiceServiceImpl.PageJuice(null, null, false, null, null));
 
         mockMvc.perform(get(JuiceController.JUICE_PATH )
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()", is(3)));
+                .andExpect(jsonPath("$.content.length()", is(3)));
 
     }
 
@@ -124,10 +124,10 @@ public class JuiceDTOControllerTest {
     @Test
     void createJuice() throws Exception {
 
-        JuiceDTO juiceDTO = juiceServiceImpl.listJuices(null, null, null, 1, 25).get(0);
+        JuiceDTO juiceDTO = juiceServiceImpl.PageJuice(null, null, null, 1, 25).getContent().get(0);
         juiceDTO.setId(null);
         juiceDTO.setVersion(null);
-        given(juiceService.saveNewJuice(any(JuiceDTO.class))).willReturn(juiceServiceImpl.listJuices(null, null, null, 1, 25).get(1));
+        given(juiceService.saveNewJuice(any(JuiceDTO.class))).willReturn(juiceServiceImpl.PageJuice(null, null, null, 1, 25).getContent().get(1));
 
         mockMvc.perform(post(JuiceController.JUICE_PATH )
                 .accept(MediaType.APPLICATION_JSON)
@@ -141,7 +141,7 @@ public class JuiceDTOControllerTest {
     void createJuiceWithNullValues() throws Exception {
 
         JuiceDTO juiceDTO = JuiceDTO.builder().build();
-        given(juiceService.saveNewJuice(any(JuiceDTO.class))).willReturn(juiceServiceImpl.listJuices(null, null, null, 1, 25).get(1));
+        given(juiceService.saveNewJuice(any(JuiceDTO.class))).willReturn(juiceServiceImpl.PageJuice(null, null, null, 1, 25).getContent().get(1));
 
         MvcResult mvcResult= mockMvc.perform(post(JuiceController.JUICE_PATH )
                         .accept(MediaType.APPLICATION_JSON)
@@ -157,7 +157,7 @@ public class JuiceDTOControllerTest {
 
     @Test
     void updateJuice() throws Exception {
-        JuiceDTO juiceDTO = juiceServiceImpl.listJuices(null, null, null, 1, 25).get(0);
+        JuiceDTO juiceDTO = juiceServiceImpl.PageJuice(null, null, null, 1, 25).getContent().get(0);
         given(juiceService.updateJuice(any(),any())).willReturn(Optional.of(juiceDTO  ));
         mockMvc.perform(put(JuiceController.JUICE_PATH_WITH_ID, juiceDTO.getId())
                 .accept(MediaType.APPLICATION_JSON)
@@ -168,7 +168,7 @@ public class JuiceDTOControllerTest {
     }
     @Test
     void updateJuiceWithNullValues() throws Exception {
-        JuiceDTO juiceDTO = juiceServiceImpl.listJuices(null, null, null, 1, 25).get(0);
+        JuiceDTO juiceDTO = juiceServiceImpl.PageJuice(null, null, null, 1, 25).getContent().get(0);
         JuiceDTO emptyDTO = JuiceDTO.builder().build();
         given(juiceService.updateJuice(any(),any())).willReturn(Optional.of(juiceDTO  ));
         MvcResult mvcResult=mockMvc.perform(put(JuiceController.JUICE_PATH_WITH_ID, juiceDTO.getId())

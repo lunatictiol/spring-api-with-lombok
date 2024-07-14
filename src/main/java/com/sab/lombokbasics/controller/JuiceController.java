@@ -5,13 +5,13 @@ import com.sab.lombokbasics.model.JuiceStyle;
 import com.sab.lombokbasics.services.JuiceService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -24,12 +24,12 @@ public class JuiceController {
     private final JuiceService juiceService;
 
     @GetMapping(path = JUICE_PATH)
-    public List<JuiceDTO> listJuices(@RequestParam(required = false) String juiceName,
+    public Page<JuiceDTO> PageJuices(@RequestParam(required = false) String juiceName,
                                      @RequestParam(required = false) JuiceStyle juiceStyle,
                                      @RequestParam(required = false) Boolean showInventory,
                                      @RequestParam(required = false) Integer pageNumber,
                                      @RequestParam(required = false) Integer size) {
-        return juiceService.listJuices(juiceName, juiceStyle, showInventory, 1, 25);
+        return juiceService.PageJuice(juiceName, juiceStyle, showInventory, pageNumber, size);
     }
 
     @GetMapping(path = JUICE_PATH_WITH_ID)

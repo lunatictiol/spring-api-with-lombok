@@ -7,7 +7,9 @@ import com.sab.lombokbasics.model.JuiceStyle;
 import com.sab.lombokbasics.repository.JuiceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -29,44 +31,43 @@ public class JuiceServiceJPA implements JuiceService {
 
 
     @Override
-    public List<JuiceDTO> listJuices(String juiceName, JuiceStyle juiceStyle,
-                                     Boolean showInventory,
-                                     Integer pageNumber,
-                                     Integer size)
+    public Page<JuiceDTO> PageJuice(String juiceName, JuiceStyle juiceStyle,
+                                    Boolean showInventory,
+                                    Integer pageNumber,
+                                    Integer size)
     {
-        List<Juice> juiceList;
+        Page<Juice> juicePage;
         PageRequest pageRequest = buildPageRequest(pageNumber, size);
 
         if (StringUtils.hasText(juiceName) && juiceStyle ==null) {
-            juiceList = getJuicesByName(juiceName);
+            juicePage = getJuicesByName(juiceName,pageRequest);
         }
         else if (StringUtils.hasText(juiceName) && juiceStyle !=null){
-            juiceList = getJuicesByNameAndJuiceStyle(juiceName,juiceStyle);
+            juicePage = getJuicesByNameAndJuiceStyle(juiceName,juiceStyle,pageRequest);
         }
         else if (!StringUtils.hasText(juiceName) && juiceStyle != null ) {
-            juiceList = getJuicesByJuiceStyle(juiceStyle);
+            juicePage = getJuicesByJuiceStyle(juiceStyle,pageRequest);
         }
         else {
-            juiceList =  juiceRepository.findAll();
+            juicePage =  juiceRepository.findAll(pageRequest);
 
         }
         if (showInventory != null && !showInventory) {
-            juiceList.forEach(juice -> juice.setQuantityOnHand(null));
+            juicePage.forEach(juice -> juice.setQuantityOnHand(null));
         }
 
 
-        return juiceList.stream().map(juiceMapper::JuiceToJuiceDTO)
-                .collect(Collectors.toList());
+        return juicePage.map(juiceMapper::JuiceToJuiceDTO);
     }
 
-    List<Juice> getJuicesByJuiceStyle(JuiceStyle juiceStyleName) {
-        return juiceRepository.findAllByJuiceStyle(juiceStyleName);
+    Page<Juice> getJuicesByJuiceStyle(JuiceStyle juiceStyleName, Pageable pageable) {
+        return juiceRepository.findAllByJuiceStyle(juiceStyleName, pageable);
     }
-    List<Juice> getJuicesByName(String name) {
-        return juiceRepository.findAllByJuiceNameIsLikeIgnoreCase("%"+name+"%");
+    Page<Juice> getJuicesByName(String name,Pageable pageable) {
+        return juiceRepository.findAllByJuiceNameIsLikeIgnoreCase("%"+name+"%", pageable);
     }
-    List<Juice> getJuicesByNameAndJuiceStyle(String name, JuiceStyle juiceStyle) {
-        return juiceRepository.findAllByJuiceNameIsLikeIgnoreCaseAndJuiceStyle("%"+name+"%",juiceStyle);
+    Page<Juice> getJuicesByNameAndJuiceStyle(String name, JuiceStyle juiceStyle,Pageable pageable) {
+        return juiceRepository.findAllByJuiceNameIsLikeIgnoreCaseAndJuiceStyle("%"+name+"%",juiceStyle, pageable);
     }
     public PageRequest buildPageRequest(Integer pageNumber, Integer pageSize) {
         int queryPageNumber;

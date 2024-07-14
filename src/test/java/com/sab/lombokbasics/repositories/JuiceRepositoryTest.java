@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -54,14 +55,14 @@ public class JuiceRepositoryTest {
     }
     @Test
     void getJuicesByNameTest(){
-        List<Juice> juices = juiceRepository.findAllByJuiceNameIsLikeIgnoreCase("%IPA%");
-        assertThat(juices.size()).isEqualTo(336);
+        Page<Juice> juices = juiceRepository.findAllByJuiceNameIsLikeIgnoreCase("%IPA%", null);
+        assertThat(juices.getContent().size()).isEqualTo(336);
 
     }
     @Test
     void getJuicesByStyleTest(){
-        List<Juice> juices = juiceRepository.findAllByJuiceStyle(JuiceStyle.ALE);
-        assertThat(juices.size()).isEqualTo(400);
+        Page<Juice> juices = juiceRepository.findAllByJuiceStyle(JuiceStyle.ALE,null );
+        assertThat(juices.getContent().size()).isEqualTo(400);
 
     }
 }

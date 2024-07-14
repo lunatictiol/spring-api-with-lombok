@@ -2,6 +2,8 @@ package com.sab.lombokbasics.services;
 
 import com.sab.lombokbasics.model.JuiceDTO;
 import com.sab.lombokbasics.model.JuiceStyle;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -57,8 +59,8 @@ public class JuiceServiceImpl implements JuiceService {
    }
 
     @Override
-    public List<JuiceDTO> listJuices(String juiceName, JuiceStyle juiceStyle, Boolean showInventory, Integer pageNumber, Integer size) {
-        return new ArrayList<>(JuiceMap.values());
+    public Page<JuiceDTO> PageJuice(String juiceName, JuiceStyle juiceStyle, Boolean showInventory, Integer pageNumber, Integer size) {
+        return new PageImpl<>(new  ArrayList<>(JuiceMap.values()));
     }
 
     @Override
