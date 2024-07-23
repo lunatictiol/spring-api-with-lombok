@@ -34,4 +34,4 @@ Unit tests are included using Mockito for mocking dependencies.
 
 
 **Additional Notes**
-* 
+* uses https://github.com/lunatictiol/oauth2-server.git for oauth2 
