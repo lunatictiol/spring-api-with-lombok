@@ -3,9 +3,11 @@ package com.sab.lombokbasics.bootstrap;
 
 import com.sab.lombokbasics.entities.Customer;
 import com.sab.lombokbasics.entities.Juice;
+import com.sab.lombokbasics.entities.JuiceOrder;
 import com.sab.lombokbasics.model.JuiceCSVRecord;
 import com.sab.lombokbasics.model.JuiceStyle;
 import com.sab.lombokbasics.repository.CustomerRepository;
+import com.sab.lombokbasics.repository.JuiceOrderRepository;
 import com.sab.lombokbasics.repository.JuiceRepository;
 import com.sab.lombokbasics.services.JuiceCsvService;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,7 @@ public class DataBootstrap implements CommandLineRunner {
        loadCSVData();
         loadCustomer();
         loadJuice();
+
 
     }
 
@@ -139,5 +142,4 @@ public class DataBootstrap implements CommandLineRunner {
            customerRepository.save(customer3);
        }
    }
-
 }

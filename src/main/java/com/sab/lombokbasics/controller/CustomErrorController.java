@@ -2,6 +2,7 @@ package com.sab.lombokbasics.controller;
 
 
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,7 +19,7 @@ public class CustomErrorController {
 
     private final View error;
 
-    public CustomErrorController(View error) {
+    public CustomErrorController(View error ) {
         this.error = error;
     }
 

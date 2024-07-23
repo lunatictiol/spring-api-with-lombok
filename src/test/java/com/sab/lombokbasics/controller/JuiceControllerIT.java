@@ -1,6 +1,7 @@
 package com.sab.lombokbasics.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sab.lombokbasics.config.SecurityConfig;
 import com.sab.lombokbasics.entities.Juice;
 import com.sab.lombokbasics.mapper.JuiceMapper;
 import com.sab.lombokbasics.model.JuiceDTO;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,10 +29,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.sab.lombokbasics.controller.JuiceControllerTest.jwtRequestPostProcessor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -57,7 +62,9 @@ class JuiceControllerIT {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac)
+                .apply(springSecurity())
+                .build();
     }
 
 
@@ -166,6 +173,7 @@ class JuiceControllerIT {
         juiceMap.put("juiceName", "New Na1234512345123451234512345123451234512345123451234512345me123451234512312345123451234512345123451234512345123451234545123451234512345123451234512345123451234512345");
 
        MvcResult mvcResult= mockMvc.perform(patch(JuiceController.JUICE_PATH_WITH_ID, juice.getId())
+                       .with(jwtRequestPostProcessor)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(juiceMap)))
@@ -175,7 +183,9 @@ class JuiceControllerIT {
     }
     @Test
     void getJuiceByName() throws Exception{
-        mockMvc.perform(get(JuiceController.JUICE_PATH).queryParam("juiceName", "IPA")
+        mockMvc.perform(get(JuiceController.JUICE_PATH)
+                        .with(jwtRequestPostProcessor)
+                        .queryParam("juiceName", "IPA")
                 .queryParam("size", "800"))
         .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.size()",is(336)))
@@ -184,7 +194,9 @@ class JuiceControllerIT {
     }
     @Test
     void getJuiceByStyle() throws Exception{
-        mockMvc.perform(get(JuiceController.JUICE_PATH).queryParam("juiceStyle", JuiceStyle.IPA.name())
+        mockMvc.perform(get(JuiceController.JUICE_PATH)
+                        .with(jwtRequestPostProcessor)
+                        .queryParam("juiceStyle", JuiceStyle.IPA.name())
                 .queryParam("size", "800"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.size()",is(547)))
@@ -194,7 +206,9 @@ class JuiceControllerIT {
     @Test
     void getJuiceByNameAndStyle() throws Exception{
 
-        mockMvc.perform(get(JuiceController.JUICE_PATH).queryParam("juiceName", "IPA")
+        mockMvc.perform(get(JuiceController.JUICE_PATH)
+                        .with(jwtRequestPostProcessor)
+                        .queryParam("juiceName", "IPA")
                         .queryParam("juiceStyle", JuiceStyle.IPA.name())
                 .queryParam("size", "800"))
                 .andExpect(status().isOk())
@@ -205,7 +219,9 @@ class JuiceControllerIT {
     @Test
     void getJuiceByNameAndStyleAndCheckInventoryIsNotNull() throws Exception{
 
-        mockMvc.perform(get(JuiceController.JUICE_PATH).queryParam("juiceName", "IPA")
+        mockMvc.perform(get(JuiceController.JUICE_PATH)
+                        .with(jwtRequestPostProcessor)
+                        .queryParam("juiceName", "IPA")
                         .queryParam("juiceStyle", JuiceStyle.IPA.name())
                         .queryParam("size", "800")
                         .queryParam("showInventory","true"))
@@ -218,7 +234,9 @@ class JuiceControllerIT {
     @Test
     void getJuiceByNameAndStyleAndCheckInventoryIsNull() throws Exception{
 
-        mockMvc.perform(get(JuiceController.JUICE_PATH).queryParam("juiceName", "IPA")
+        mockMvc.perform(get(JuiceController.JUICE_PATH)
+                        .with(jwtRequestPostProcessor)
+                        .queryParam("juiceName", "IPA")
                         .queryParam("juiceStyle", JuiceStyle.IPA.name())
                         .queryParam("size", "800")
                         .queryParam("showInventory","false"))
@@ -231,7 +249,9 @@ class JuiceControllerIT {
     @Test
     void getJuicesOnPageTwo() throws Exception{
 
-        mockMvc.perform(get(JuiceController.JUICE_PATH).queryParam("juiceName", "IPA")
+        mockMvc.perform(get(JuiceController.JUICE_PATH)
+                        .with(jwtRequestPostProcessor)
+                        .queryParam("juiceName", "IPA")
                         .queryParam("juiceStyle", JuiceStyle.IPA.name())
                         .queryParam("showInventory","false")
                         .queryParam("pageNumber", "2")
